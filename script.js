@@ -5,7 +5,7 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 
 let snake, apple, dx, dy, score, gameLoop;
-let nextDirection = null; // buffer for queued direction
+let nextDirection = null;
 
 document.addEventListener('keydown', handleKey);
 document.getElementById('restartBtn').addEventListener('click', startGame);
@@ -31,24 +31,18 @@ function startGame() {
 function handleKey(e) {
   const dir = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
   if (!dir) return;
-
   const [ndx, ndy] = dir;
-  if (ndx === -dx && ndy === -dy) return; // prevent reverse
-
+  if (ndx === -dx && ndy === -dy) return;
   nextDirection = dir;
 }
 
 function gameTick() {
-  // Apply next direction if valid
   if (nextDirection) {
-    const [ndx, ndy] = nextDirection;
-    dx = ndx;
-    dy = ndy;
+    [dx, dy] = nextDirection;
     nextDirection = null;
   }
 
   const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-
   const hitWall = head.x < 0 || head.y < 0 || head.x >= tileCount || head.y >= tileCount;
   const hitSelf = snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y);
 
@@ -79,17 +73,36 @@ function placeApple() {
 }
 
 function drawGame() {
-  ctx.fillStyle = '#222';
+  ctx.fillStyle = '#2a2a2a';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = 'lime';
+  ctx.fillStyle = '#66ff66';
   snake.forEach(seg => {
-    ctx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize - 2, gridSize - 2);
+    ctx.beginPath();
+    ctx.roundRect(seg.x * gridSize, seg.y * gridSize, gridSize - 2, gridSize - 2, 6);
+    ctx.fill();
   });
 
-  ctx.fillStyle = 'red';
-  ctx.fillRect(apple.x * gridSize, apple.y * gridSize, gridSize - 2, gridSize - 2);
+  ctx.fillStyle = 'tomato';
+  ctx.beginPath();
+  ctx.roundRect(apple.x * gridSize, apple.y * gridSize, gridSize - 2, gridSize - 2, 6);
+  ctx.fill();
 }
 
-// Auto-start the game
+// Polyfill for rounded rectangle drawing
+CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+  this.beginPath();
+  this.moveTo(x + r, y);
+  this.lineTo(x + w - r, y);
+  this.quadraticCurveTo(x + w, y, x + w, y + r);
+  this.lineTo(x + w, y + h - r);
+  this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  this.lineTo(x + r, y + h);
+  this.quadraticCurveTo(x, y + h, x, y + h - r);
+  this.lineTo(x, y + r);
+  this.quadraticCurveTo(x, y, x + r, y);
+  this.closePath();
+  this.fill();
+};
+
 startGame();
