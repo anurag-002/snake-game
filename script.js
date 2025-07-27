@@ -80,4 +80,3 @@ function drawGame() {
 
 // Start game initially
 startGame();
-
