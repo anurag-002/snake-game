@@ -5,6 +5,7 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 
 let snake, apple, dx, dy, score, gameLoop;
+let inputLocked = false; // 🚫 Prevent multiple inputs per tick
 
 document.addEventListener('keydown', handleKey);
 document.getElementById('restartBtn').addEventListener('click', startGame);
@@ -19,6 +20,7 @@ function startGame() {
   dx = 1;
   dy = 0;
   score = 0;
+  inputLocked = false;
   document.getElementById('score').textContent = score;
   placeApple();
 
@@ -27,10 +29,14 @@ function startGame() {
 }
 
 function handleKey(e) {
+  if (inputLocked) return;
+
   if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
   else if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
   else if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
   else if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+
+  inputLocked = true;
 }
 
 function gameTick() {
@@ -56,6 +62,7 @@ function gameTick() {
   }
 
   drawGame();
+  inputLocked = false; // 🔓 Unlock input for next tick
 }
 
 function placeApple() {
@@ -80,3 +87,4 @@ function drawGame() {
 
 // Start game initially
 startGame();
+
