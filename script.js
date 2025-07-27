@@ -22,7 +22,11 @@ function handleKey(e) {
 function gameTick() {
   const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-  if (head.x < 0 || head.y < 0 || head.x >= tileCount || head.y >= tileCount || snake.some(seg => seg.x === head.x && seg.y === head.y)) {
+  // Collision check: wall or self
+  const hitWall = head.x < 0 || head.y < 0 || head.x >= tileCount || head.y >= tileCount;
+  const hitSelf = snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y);
+
+  if (hitWall || hitSelf) {
     clearInterval(gameLoop);
     alert("Game Over! Score: " + score);
     return;
@@ -40,6 +44,7 @@ function gameTick() {
 
   drawGame();
 }
+
 
 function placeApple() {
   apple = {
