@@ -5,7 +5,7 @@ const gridSize = 20;
 const tileCount = canvas.width / gridSize;
 
 let snake, apple, dx, dy, score, gameLoop;
-let inputLocked = false; // 🚫 Prevent multiple inputs per tick
+let nextDirection = null; // buffer for queued direction
 
 document.addEventListener('keydown', handleKey);
 document.getElementById('restartBtn').addEventListener('click', startGame);
@@ -20,7 +20,7 @@ function startGame() {
   dx = 1;
   dy = 0;
   score = 0;
-  inputLocked = false;
+  nextDirection = null;
   document.getElementById('score').textContent = score;
   placeApple();
 
@@ -29,17 +29,24 @@ function startGame() {
 }
 
 function handleKey(e) {
-  if (inputLocked) return;
+  const dir = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
+  if (!dir) return;
 
-  if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
-  else if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
-  else if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
-  else if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+  const [ndx, ndy] = dir;
+  if (ndx === -dx && ndy === -dy) return; // prevent reverse
 
-  inputLocked = true;
+  nextDirection = dir;
 }
 
 function gameTick() {
+  // Apply next direction if valid
+  if (nextDirection) {
+    const [ndx, ndy] = nextDirection;
+    dx = ndx;
+    dy = ndy;
+    nextDirection = null;
+  }
+
   const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
   const hitWall = head.x < 0 || head.y < 0 || head.x >= tileCount || head.y >= tileCount;
@@ -62,7 +69,6 @@ function gameTick() {
   }
 
   drawGame();
-  inputLocked = false; // 🔓 Unlock input for next tick
 }
 
 function placeApple() {
@@ -85,6 +91,5 @@ function drawGame() {
   ctx.fillRect(apple.x * gridSize, apple.y * gridSize, gridSize - 2, gridSize - 2);
 }
 
-// Start game initially
+// Auto-start the game
 startGame();
-
