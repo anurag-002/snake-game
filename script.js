@@ -29,11 +29,21 @@ function startGame() {
 }
 
 function handleKey(e) {
-  const dir = { W: [0, -1], A: [0, 1], S: [-1, 0], D: [1, 0] }[e.key];
+  const key = e.key.toLowerCase(); // handle caps/shift
+  const map = {
+    w: [0, -1],  // up
+    s: [0,  1],  // down
+    a: [-1, 0],  // left
+    d: [1,  0]   // right
+  };
+
+  const dir = map[key];
   if (!dir) return;
 
   const [ndx, ndy] = dir;
-  if (ndx === -dx && ndy === -dy) return; // prevent reverse
+
+  // prevent instant 180° reverse
+  if (ndx === -dx && ndy === -dy) return;
 
   nextDirection = dir;
 }
@@ -93,3 +103,4 @@ function drawGame() {
 
 // Auto-start the game
 startGame();
+
