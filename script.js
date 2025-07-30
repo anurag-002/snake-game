@@ -29,7 +29,7 @@ function startGame() {
 }
 
 function handleKey(e) {
-  const dir = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
+  const dir = { W: [0, -1], A: [0, 1], S: [-1, 0], D: [1, 0] }[e.key];
   if (!dir) return;
 
   const [ndx, ndy] = dir;
